@@ -1,0 +1,18 @@
+[Unit]
+ Description=Aria2 Service
+ Documentation=man:aria2c(1)
+ Requires=network.target
+ After=dhcpcd.service
+
+[Service]
+ User=www-data
+ Group=www-data
+ Type=forking
+ ExecStart=/usr/bin/aria2c --conf-path=/etc/aria2c/aria2c.conf
+ ExecReload=/bin/kill -s HUP $MAINPID
+ RemainAfterExit=yes
+ Restart=on-failure
+ RestartSec=15s
+
+[Install]
+ WantedBy=multi-user.target

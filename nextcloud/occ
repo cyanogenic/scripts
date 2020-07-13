@@ -1,0 +1,12 @@
+#!/bin/bash
+
+#occ的路径
+occ_path=/media/data/nextcloud/occ
+#运行nextcloud的用户
+current_user=www-data
+#如果当前用户为www-data
+if [ "$current_user" = "$USER" ]; then
+	$occ_path $*
+else
+	sudo -u www-data $occ_path $*
+fi
