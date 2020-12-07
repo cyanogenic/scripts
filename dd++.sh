@@ -6,7 +6,7 @@
 #######################################
 signal()
 {
-    #TODO:检测多个kill程序
+    #TODO:检测多个kill程序,防止乱杀
     while :
     do
         pkill -USR1 ^dd$
