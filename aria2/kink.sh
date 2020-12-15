@@ -1,9 +1,9 @@
 #!/bin/bash
-
+  
 NEXTCLOUD_FOLDER=/media/data/nextcloud-data/cyan/files
 NEXTCLOUD_OCC_FOLDER=/cyan/files
 
-TEST()
+INFO()
 {
     echo "FILE_PATH=$FILE_PATH"
     echo "FILE_DIR=$FILE_DIR"
@@ -28,21 +28,33 @@ TITLE="`curl -s https://www.kink.com/shoot/$ID | grep \<title\> | cut -d '>' -f 
 #简介
 DESCIPTION=
 #分类
-CATEGORY="`curl -s https://www.kink.com/shoot/101664 | grep data-sitename | cut -d '"' -f 6`"
+CATEGORY="`curl -s https://www.kink.com/shoot/$ID | grep "kbar kbar-" | cut -d '-' -f 2 | cut -d ' ' -f 1`"
 #套图
-IMAGE="${ID}_images.zip"
+IMAGE="`ls $FILE_DIR/*${ID}_*.zip | xargs`"
 
 #测一手
-TEST
-
+INFO
 
 #开整
+if test -z "${TITLE}";then
+    echo "未获取到TITLE"            
+    exit 2
+elif test -z "${CATEGORY}";then
+    echo "未获取到CATEGORY"
+    exit 2
+fi
+#建文件夹
 sudo -u www-data mkdir -p $NEXTCLOUD_FOLDER/eivi/kink/$CATEGORY/$ID-"${TITLE}"
+#移动视频
 sudo -u www-data mv $FILE_PATH $NEXTCLOUD_FOLDER/eivi/kink/$CATEGORY/$ID-"${TITLE}"/"${TITLE}".$FILE_SUFFIX
 #是否存在套图
-if [[ `ls $FILE_DIR/$IMAGE > /dev/null 2>&1 && echo $?` -eq 0 ]];then
-    sudo mv $FILE_DIR/$IMAGE $NEXTCLOUD_FOLDER/eivi/kink/$CATEGORY/$ID-"${TITLE}" && cd $NEXTCLOUD_FOLDER/eivi/kink/$CATEGORY/$ID-"${TITLE}" && sudo -u www-data unzip $IMAGE && sudo rm $IMAGE
+if test -n "${IMAGE}";then
+    echo "存在$ID的套图"            
+    sudo find $FILE_DIR -name "*$ID*.zip" -print -exec mv {} $NEXTCLOUD_FOLDER/eivi/kink/$CATEGORY/$ID-"${TITLE}"/ \;
+    cd $NEXTCLOUD_FOLDER/eivi/kink/$CATEGORY/$ID-"${TITLE}" && sudo unzip *.zip && sudo rm *.zip
 else
     echo "未检测到$ID的套图"
 fi
+#更新索引
 occ files:scan --path="$NEXTCLOUD_OCC_FOLDER/eivi/kink/$CATEGORY"
+occ files:scan --path="$NEXTCLOUD_OCC_FOLDER/aria2c"
