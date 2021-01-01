@@ -1,0 +1,11 @@
+[Unit]
+ Description=iptables fowarding Service
+ Requires=network.target
+ After=
+
+[Service]
+ Type=oneshot
+ ExecStart=/opt/iptables-foward/iptables-foward.sh
+
+[Install]
+ WantedBy=multi-user.target
