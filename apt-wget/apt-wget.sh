@@ -1,13 +1,14 @@
 #!/bin/bash
 
 source `dirname $0`/apt-wget.conf
+NAME="InRelease Release Release.gpg"
 
 # TODO 多线程wget
 for distro in $DISTRO
 do
 	# Release
 	mkdir -p $REPO/dists/$distro
-	for name in "InRelease Release Release.gpg"
+	for name in $NAME
 	do
 		wget -P $REPO/dists/$distro $REPO/dists/$distro/$name
 	done
